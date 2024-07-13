@@ -1,0 +1,10 @@
+database:
+  host: # your ip address
+  hostname: # your hostname
+  port: # '80'
+  user: # username
+  password: # password
+  database_name: # database name
+  table_upbit: # table name for price
+  table_user: # table name for user information
+  created_date: # update date
