@@ -2,6 +2,7 @@ import pyupbit
 import yaml
 import pymysql
 import pandas as pd
+import bcrypt
 
 class DBOpen:
     """
@@ -230,7 +231,32 @@ class DBOpen:
     # Streamlit Login
     def login(self, username, password, USER_DATA):
         """User Authentication Method"""
-        if username in USER_DATA and USER_DATA[username] == password:
+        if username in USER_DATA and bcrypt.checkpw(password.encode('utf-8'),
+                                                    USER_DATA[username].encode('utf-8')):
             return True
         return False
+    
+    # Verify User Login
+    def verify_user_login(self, ENTERED_USER_NAME, ENTERED_PASSWORD):
+        """
+        Retrieve the stored hash from the database
+        """
+        query = f'SELECT PASSWORD FROM {self.table_user} WHERE USERNAME = %s'
+        conn = self.create_connection()
+        try:
+            c = conn.cursor()
+            c.execute(query, (ENTERED_USER_NAME,))
+            result = c.fetchone()
+            if result:
+                stored_hash = result['PASSWORD'].encode('utf-8')
+                if bcrypt.checkpw(ENTERED_PASSWORD.encode('utf-8'), stored_hash):
+                    print('Login successful!')
+                else:
+                    print('Wrong password..')
+            else:
+                print(f'{ENTERED_USER_NAME} not found.. Check your username..')
+        except Exception as e:
+            print(e)
+
+        return
 
